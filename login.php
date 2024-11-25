@@ -10,7 +10,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $captchaInput = $_POST['captchaInput'];
 
     // Validasi captcha
-    if ($captchaInput == $_SESSION['captcha_answer']) {
+    if ($captchaInput == $_SESSION['captcha_solution']) {
         // Redirect ke home.php jika captcha benar
         header("Location: home.php");
         exit();
@@ -44,6 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         type="text"
                         name="username"
                         id="username"
+                        placeholder="Masukkan Username"
                         class="rounded-md py-3 px-5 outline-none bg-white/40 placeholder-gray-500 text-black"
                         required />
                 </label>
@@ -55,6 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         type="password"
                         name="password"
                         id="password"
+                        placeholder="Masukkan Password"
                         class="rounded-md py-3 px-5 outline-none bg-white/40 placeholder-gray-500 text-black"
                         required />
                 </label>
@@ -75,6 +77,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         type="text"
                         name="captchaInput"
                         id="captchaInput"
+                        placeholder="Masukkan Jawaban"
                         class="rounded-md py-3 px-5 outline-none bg-white/40 placeholder-gray-500 text-black"
                         required />
                     <!-- Error Message -->
