@@ -1,36 +1,67 @@
 <?php
-// Mulai session untuk menyimpan jawaban captcha
 session_start();
 
-// Generate angka random untuk operasi matematika
+// Generate random numbers and an operation
 $num1 = rand(1, 9);
 $num2 = rand(1, 9);
-$captchaAnswer = $num1 * $num2;
+$operations = ['+', '-', '*'];
+$operation = $operations[array_rand($operations)];
+$problem = "$num1 $operation $num2";
 
-// Simpan jawaban ke dalam session
-$_SESSION['captcha_answer'] = $captchaAnswer;
+// Compute the solution
+switch ($operation) {
+    case '+':
+        $solution = $num1 + $num2;
+        break;
+    case '-':
+        $solution = $num1 - $num2;
+        break;
+    case '*':
+        $solution = $num1 * $num2;
+        break;
+}
+$_SESSION['captcha_solution'] = $solution;
 
-// Buat gambar kosong
-$width = 120;
-$height = 40;
-$image = imagecreate($width, $height);
+// Create the CAPTCHA image
+header('Content-Type: image/png');
+$width = 150;
+$height = 50;
+$image = imagecreatetruecolor($width, $height);
 
-// Warna latar belakang dan teks
-$backgroundColor = imagecolorallocate($image, 255, 255, 255); // Putih
-$textColor = imagecolorallocate($image, 0, 0, 0); // Hitam
-$lineColor = imagecolorallocate($image, 100, 100, 100); // Abu-abu
+// Colors
+$background_color = imagecolorallocate($image, 220, 220, 220); // Light gray
+$text_color = imagecolorallocate($image, 0, 0, 0);             // Black
+$line_color = imagecolorallocate($image, 50, 50, 50);          // Dark gray
 
-// Tambahkan beberapa garis untuk mengaburkan captcha
-for ($i = 0; $i < 5; $i++) {
-    imageline($image, rand(0, $width), rand(0, $height), rand(0, $width), rand(0, $height), $lineColor);
+// Fill background
+imagefilledrectangle($image, 0, 0, $width, $height, $background_color);
+
+// Add wavy lines
+for ($i = 0; $i < 2; $i++) {
+    $x1 = rand(0, $width / 2);
+    $x2 = rand($width / 2, $width);
+    $y1 = rand(0, $height);
+    $y2 = rand(0, $height);
+    imageline($image, $x1, $y1, $x2, $y2, $line_color);
 }
 
-// Tambahkan teks captcha ke gambar
-$captchaText = "$num1 * $num2";
-imagestring($image, 5, 30, 10, $captchaText, $textColor);
+// Add distorted text (character by character)
+$font_size = 20;
+$font = __DIR__ . '/Arial.ttf'; // Ensure Arial.ttf is present in the same directory
+for ($i = 0; $i < strlen($problem); $i++) {
+    $angle = rand(-15, 15); // Mild distortion
+    $x = 10 + ($i * 30);    // Adjust spacing between characters
+    $y = rand(30, 40);      // Randomize vertical position slightly
+    imagettftext($image, $font_size, $angle, $x, $y, $text_color, $font, $problem[$i]);
+}
 
-// Kirim gambar ke browser
-header('Content-type: image/png');
+// Add minimal dots (noise)
+for ($i = 0; $i < 50; $i++) {
+    $dot_color = imagecolorallocate($image, rand(0, 50), rand(0, 50), rand(0, 50));
+    imagesetpixel($image, rand(0, $width), rand(0, $height), $dot_color);
+}
+
+// Output the image
 imagepng($image);
 imagedestroy($image);
 ?>
